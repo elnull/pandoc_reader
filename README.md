@@ -8,7 +8,7 @@ Requirements
 ------------
 
   - [pandoc] in $PATH
-
+  - [PyYAML] installed if you want to parse [YAML metadata]
 
 Installation
 ------------
@@ -37,6 +37,28 @@ PANDOC_EXTENSIONS parameter.
       '-citations'
     ]
 
+
+YAML Metadata
+-------------
+
+No configuration is required to use YAML metadata. Simply include it at the top
+of your post, started by `---` and terminated by `---` or `...`. If PyYAML is
+not installed, the data will be parsed by the normal metadata parser instead.
+For example:
+
+    ---
+    title: Using YAML with Pandoc!
+    author: Your Name
+    date: 2015-05-15 14:07
+    description: >
+        You can include long, multiline descriptions which
+        can wrap across multiple lines (and will be joined
+        by YAML).
+    complex:
+        - or complex data structures
+        - like lists
+    ...
+
 Contributing
 ------------
 
@@ -50,3 +72,5 @@ Contributing
 [markdown]: http://daringfireball.net/projects/markdown/
 [pandoc]: http://johnmacfarlane.net/pandoc/
 [pelican]: http://getpelican.com
+[PyYAML]: http://pyyaml.org/
+[YAML metadata]: http://pandoc.org/README.html#extension-yaml_metadata_block
