@@ -1,3 +1,4 @@
+import logging
 import subprocess
 
 from pelican import signals
@@ -8,6 +9,7 @@ try:
     import yaml
 except ImportError:
     yaml = None
+    logging.warning("YAML is not installed; the YAML reader will not work.")
 
 
 class PandocReader(BaseReader):
@@ -21,24 +23,24 @@ class PandocReader(BaseReader):
         if use_YAML:
             # Load the data we need to parse
             to_parse = []
-            text = text[1:]
-            for i, line in enumerate(text):
+            for i, line in enumerate(text[1:]):
                 # When we find a terminator (`---` or `...`), stop.
-                if line == '---' or line == '...':
+                if line in ('---', '...'):
                     # Do not include the terminator itself.
-                    content = "\n".join(text[i+1:])
                     break
 
                 # Otherwise, just keep adding the lines to the parseable.
                 to_parse.append(line)
 
-            to_parse = "\n".join(to_parse)
-            parsed = yaml.load(to_parse)
+            parsed = yaml.load("\n".join(to_parse))
 
             # Postprocess to make the data usable by Pelican.
             for k in parsed:
-                name, value = k.lower(), str(parsed[k]).strip()
+                name, value = k.lower(), parsed[k]
                 metadata[name] = self.process_metadata(name, value)
+
+            # Return the text entirely.
+            content = "\n".join(text)
 
         else:
             for i, line in enumerate(text):
