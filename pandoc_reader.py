@@ -4,7 +4,6 @@ import subprocess
 from pelican import signals
 from pelican.readers import BaseReader
 from pelican.utils import pelican_open
-import urllib.parse
 
 
 try:
@@ -70,19 +69,29 @@ class PandocReader(BaseReader):
         pandoc_cmd = ["pandoc", "--from=markdown" + extensions, "--to=html5"]
         pandoc_cmd.extend(extra_args)
 
+        if "bibliography" in metadata.keys():
+            bib_file = os.path.join(bib_dir, metadata['bibliography'])
+            extra_args = extra_args + ['--bibliography={}'.format(bib_file)]
+
+            if bib_header is not None:
+                extra_args = extra_args + [
+                    '--metadata=reference-section-title="{}"'.format(
+                        bib_header)]
+
         proc = subprocess.Popen(pandoc_cmd,
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE)
 
         output = proc.communicate(content.encode('utf-8'))[0].decode('utf-8')
         status = proc.wait()
-        if status:
-            raise subprocess.CalledProcessError(status, pandoc_cmd)
-        # pandoc will aggressively percent-encode URLs, breaking things.
-        # This nasty hack will undo such quoting (in fact too aggressively, if
-        # I have percent signs in my content, but I don't
-        # so I don't care for now) str.replace might be saner.
-        output = urllib.parse.unquote(output)
+
+        # Just in case, let's make sure we don't lose Pelican template
+        # parameters.
+        output = output.replace('%7Battach%7D', '{attach}')\
+                       .replace('%7Bfilename%7D', '{filename}')\
+                       .replace('%7Btag%7D', '{tag}')\
+                       .replace('%7Bcategory%7D', '{category}')
+
         return output, metadata
 
 
