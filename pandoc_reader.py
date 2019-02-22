@@ -79,7 +79,7 @@ class PandocReader(BaseReader):
         if status:
             raise subprocess.CalledProcessError(status, pandoc_cmd)
 
-        return output, metadata
+        return urllib.parse.unquote(output), metadata
 
 
 def add_reader(readers):
