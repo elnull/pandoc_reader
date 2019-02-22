@@ -4,7 +4,7 @@ import subprocess
 from pelican import signals
 from pelican.readers import BaseReader
 from pelican.utils import pelican_open
-
+import os
 
 try:
     import yaml
@@ -60,6 +60,15 @@ class PandocReader(BaseReader):
             text = list(fp.splitlines())
 
         metadata, content = self._get_meta_and_content(text)
+        bib_dir = self.settings.get('PANDOC_BIBDIR', '')
+
+        bib_header = self.settings.get('PANDOC_BIBHEADER', None)
+
+        # filters = self.settings.get('PANDOC_FILTERS', [])
+        extensions = self.settings.get('PANDOC_EXTENSIONS', '')
+        if isinstance(extensions, list):
+            extensions = ''.join(extensions)
+
 
         extra_args = self.settings.get('PANDOC_ARGS', [])
         extensions = self.settings.get('PANDOC_EXTENSIONS', '')
