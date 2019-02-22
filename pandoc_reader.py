@@ -78,8 +78,12 @@ class PandocReader(BaseReader):
         status = proc.wait()
         if status:
             raise subprocess.CalledProcessError(status, pandoc_cmd)
-
-        return urllib.parse.unquote(output), metadata
+        # pandoc will aggressively percent-encode URLs, breaking things.
+        # This nasty hack will undo such quoting (in fact too aggressively, if
+        # I have percent signs in my content, but I don't
+        # so I don't care for now) str.replace might be saner.
+        output = urllib.parse.unquote(output)
+        return output, metadata
 
 
 def add_reader(readers):
