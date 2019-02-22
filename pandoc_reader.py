@@ -4,6 +4,8 @@ import subprocess
 from pelican import signals
 from pelican.readers import BaseReader
 from pelican.utils import pelican_open
+import urllib.parse
+
 
 try:
     import yaml
