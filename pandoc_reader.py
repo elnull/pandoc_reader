@@ -64,11 +64,10 @@ class PandocReader(BaseReader):
 
         bib_header = self.settings.get('PANDOC_BIBHEADER', None)
 
-        # filters = self.settings.get('PANDOC_FILTERS', [])
+        filters = self.settings.get('PANDOC_FILTERS', [])
         extensions = self.settings.get('PANDOC_EXTENSIONS', '')
         if isinstance(extensions, list):
             extensions = ''.join(extensions)
-
 
         extra_args = self.settings.get('PANDOC_ARGS', [])
         extensions = self.settings.get('PANDOC_EXTENSIONS', '')
@@ -76,6 +75,8 @@ class PandocReader(BaseReader):
             extensions = ''.join(extensions)
 
         pandoc_cmd = ["pandoc", "--from=markdown" + extensions, "--to=html5"]
+        for filt in filters:
+            pandoc_cmd.extend(["--filter", filt])
         pandoc_cmd.extend(extra_args)
 
         if "bibliography" in metadata.keys():
@@ -87,9 +88,10 @@ class PandocReader(BaseReader):
                     '--metadata=reference-section-title="{}"'.format(
                         bib_header)]
 
-        proc = subprocess.Popen(pandoc_cmd,
-                                stdin=subprocess.PIPE,
-                                stdout=subprocess.PIPE)
+        proc = subprocess.Popen(
+            pandoc_cmd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE)
 
         output = proc.communicate(content.encode('utf-8'))[0].decode('utf-8')
         status = proc.wait()
