@@ -81,6 +81,8 @@ class PandocReader(BaseReader):
 
         if "bibliography" in metadata.keys():
             bib_file = os.path.join(bib_dir, metadata['bibliography'])
+            if not os.path.exists(bib_file):
+                raise FileNotFoundError(bib_file)
             extra_args = extra_args + ['--bibliography={}'.format(bib_file)]
 
             if bib_header is not None:
@@ -91,13 +93,16 @@ class PandocReader(BaseReader):
         proc = subprocess.Popen(
             pandoc_cmd,
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE)
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
 
-        output = proc.communicate(content.encode('utf-8'))[0].decode('utf-8')
+        output, err = proc.communicate(content.encode('utf-8'))
         status = proc.wait()
+        output, err = output.decode('utf-8'), err.decode('utf-8')
+        if status > 0:
+            logging.warning(output + err)
 
-        # Just in case, let's make sure we don't lose Pelican template
-        # parameters.
+        # Make sure we don't lose Pelican template parameters.
         output = output.replace('%7Battach%7D', '{attach}')\
                        .replace('%7Bfilename%7D', '{filename}')\
                        .replace('%7Btag%7D', '{tag}')\
