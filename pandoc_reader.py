@@ -105,6 +105,7 @@ class PandocReader(BaseReader):
         # Make sure we don't lose Pelican template parameters.
         output = output.replace('%7Battach%7D', '{attach}')\
                        .replace('%7Bfilename%7D', '{filename}')\
+                       .replace('%7Bstatic%7D', '{static}')\
                        .replace('%7Btag%7D', '{tag}')\
                        .replace('%7Bcategory%7D', '{category}')
 
