@@ -40,6 +40,9 @@ class PandocReader(BaseReader):
                 name, value = k.lower(), parsed[k]
                 metadata[name] = self.process_metadata(name, value)
 
+            if (not 'summary' in metadata) or (metadata['summary'] is None):
+                metadata['summary'] = ''
+
             # Return the text entirely.
             content = "\n".join(text)
 
