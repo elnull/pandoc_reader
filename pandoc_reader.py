@@ -90,6 +90,10 @@ class PandocReader(BaseReader):
                     '--metadata=reference-section-title="{}"'.format(
                         bib_header)]
 
+        if "toc" in metadata.keys():
+            if metadata['toc'] == True:
+                pandoc_cmd.extend(['--toc'])
+
         proc = subprocess.Popen(
             pandoc_cmd,
             stdin=subprocess.PIPE,
