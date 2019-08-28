@@ -77,7 +77,6 @@ class PandocReader(BaseReader):
         pandoc_cmd = ["pandoc", "--from=markdown" + extensions, "--to=html5"]
         for filt in filters:
             pandoc_cmd.extend(["--filter", filt])
-        pandoc_cmd.extend(extra_args)
 
         if "bibliography" in metadata.keys():
             bib_file = os.path.join(bib_dir, metadata['bibliography'])
@@ -89,6 +88,8 @@ class PandocReader(BaseReader):
                 extra_args = extra_args + [
                     '--metadata=reference-section-title="{}"'.format(
                         bib_header)]
+
+        pandoc_cmd.extend(extra_args)
 
         proc = subprocess.Popen(
             pandoc_cmd,
